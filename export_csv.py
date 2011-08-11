@@ -46,7 +46,13 @@ def get_list_vente(path):
     csvfile = open(path_csv)
     dialect = csv.Sniffer().sniff(csvfile.read(1024))
     csvfile.seek(0)
-    return csv.DictReader(csvfile, dialect = dialect)
+    result = list(csv.DictReader(csvfile, dialect = dialect))
+    for item in result:
+        for version in list_version:
+            fields_product = ["UB-20CD-%s" % version, "UB-CD-%s" % version]
+            for product in fields_product:
+                item.setdefault(product, '')
+    return result
 
 
 def get_map_departement_region():
@@ -127,11 +133,9 @@ def generation_svg_document(datas, path_template,  path_dest):
     save_file.close()
 
 if __name__ == '__main__':
-    if not len(sys.argv) in ( 2, 3):
+    if not len(sys.argv) in (1,2):
         print "Vous devez specifier un fichier csv"
         sys.exit(0)
-    if len(sys.argv) == 3:
-        path_save_french = sys.argv[2]
     path_csv = sys.argv[1]
     list_vente = list(get_list_vente(path_csv))
     map_departement_region = get_map_departement_region()
